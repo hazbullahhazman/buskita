@@ -1,31 +1,34 @@
-# Manual upload and setup
+# Upload and deploy the fixed BasKita demo
 
-## Upload to GitHub
+1. Extract the ZIP. Upload its contents to your GitHub repository, replacing the previous files. Include `api`, `server`, `src`, `shared`, `vercel.json`, and the other root files. Do not upload the ZIP itself as source.
+2. In your Vercel project, open Storage / Marketplace and connect an **Upstash Redis** database to this project. Follow the provider's account and plan prompts.
+3. In Vercel Project Settings > Environment Variables, verify `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are present for Production. The app also accepts `KV_REST_API_URL` and `KV_REST_API_TOKEN`. If the integration uses different names, copy its REST URL and full-access REST token into the expected names. Never put the token in GitHub or a variable beginning with `VITE_`.
+4. Use a separate database or a different `BASKITA_STATE_KEY` for Preview deployments to isolate their data.
+5. Use Framework Preset **Vite**, Build Command **npm run build**, Output Directory **dist**, and Node.js 22 or 24. Root Directory must contain `package.json` and `vercel.json` (normally the repository root).
+6. Leave `VITE_PUBLIC_URL` empty so QR links use the deployed domain. Remove any old localhost value. Google Maps is optional; the default map uses OpenStreetMap.
+7. Redeploy after uploading the code and configuring the database variables.
+8. Visit `/api/state` on your deployed domain. It should return JSON with a `buses` array. A 503 with a storage message means the database configuration needs attention.
+9. Open `/`, `/driver`, and `/office` and refresh each page. Create a passenger request and check the driver and office pages. Updates appear in about three seconds plus network time; requests should survive page reloads.
 
-1. Extract this ZIP on your computer.
-2. Open your new GitHub repository and choose **uploading an existing file** (or **Add file → Upload files**).
-3. Upload the extracted files and the `src`, `shared`, `server`, and `tests` folders. Keep `package.json` at the repository root. Do not upload the ZIP as the application source.
-4. Include `.gitignore` and `.env.example`. Never upload `.env.local`, real API keys, `node_modules`, or `.demo-data`.
-5. Commit the upload.
+## Why the old deployment failed
 
-## Run the complete demo
+The old upload contained a local Express server. Vercel served the frontend without that backend, so it waited forever for bus data. It also lacked route rewrites for direct visits to the driver and office pages.
 
-Install Node.js 22.12 or newer. Open a terminal in the extracted folder:
+This version includes route rewrites and serverless API functions with shared Redis storage. The frontend polls instead of keeping a permanent SSE connection open. Simulated movement is calculated from elapsed time, and atomic database updates protect concurrent bookings.
+
+## Local development
+
+Install Node.js 22.12 or newer, then run:
 
 ```sh
 npm ci
-npm run build
-npm start
+npm run dev
 ```
 
-Open `http://localhost:4317` for passengers, `/driver` for drivers, and `/office` for the office dashboard. All pages connect to the same running server.
+Open http://localhost:4317, http://localhost:4317/driver, and http://localhost:4317/office. Local development still uses the local Express server and `.demo-data`; Redis is only required by the cloud API.
 
-## Vercel deployment status
+## Verification and scope
 
-**This archive contains the working local application, not a completed Vercel adaptation.** Deploying only its Vite frontend will not provide working bookings, GPS updates, or office statistics: those pages require the Express API.
+The cloud API is tested locally using a Redis REST test double. An actual Vercel deployment and real Upstash connection still require verification after you redeploy. No credentials are included in this archive.
 
-The current backend uses a continuously running simulation timer, Server-Sent Events, and a local JSON file. Before using Vercel for the complete app, replace file storage with a shared database, implement request-driven simulation updates, and adapt the live-update transport and API to serverless execution. No cloud database or Vercel credentials are included.
-
-Alternatively, host the complete Node application on a server with persistent disk and support for long-lived HTTP connections. Use `npm ci && npm run build` to build and `npm start` to launch, configure `PORT` if required by the host, and persist the directory specified by `DEMO_DATA_DIR`. Use HTTPS for phone GPS. Run one application instance with the current file storage implementation.
-
-The three user identities and driver/office pages are open demo roles, not authenticated accounts. Route geometry and proposed stops still need UTM field verification. See `README.md` for the demo's limitations and walkthrough.
+This remains an open demonstration with three shared identities and unauthenticated driver/office pages. The route and stop coordinates are approximate and need UTM field verification before operational use.

@@ -15,7 +15,7 @@ npm run dev
 - Driver: http://localhost:4317/driver
 - Office: http://localhost:4317/office
 
-The three pages use the same Express backend, with Server-Sent Events for shared updates. Driver actions update passenger trips and office statistics. Requests, reports and bus state persist in `.demo-data/state.json` on this computer. This is a single-server demo, not a multi-instance production database.
+The three pages use the same Express backend, with API polling every three seconds for shared updates. Driver actions update passenger trips and office statistics. Requests, reports and bus state persist in `.demo-data/state.json` on this computer. This is a single-server demo, not a multi-instance production database.
 
 If another application uses the default port, set the `PORT` environment variable. In PowerShell: `$env:PORT='4320'`, then `npm run dev`.
 
@@ -25,7 +25,7 @@ Open the computer's LAN address, e.g. `http://<computer-ip>:4317`, on devices us
 
 For a shared HTTPS hosting address, set `VITE_PUBLIC_URL=https://your-demo-host` in `.env.local`, then restart development or rebuild production. Each QR includes a stop ID. Driver and office have separate paths on the same domain.
 
-Public browser GPS requires HTTPS (localhost is the development exception). LAN HTTP works for simulated buses and bookings, but not reliable phone GPS access. No deployment or HTTPS tunnel is configured by this project.
+Public browser GPS requires HTTPS (localhost is the development exception). LAN HTTP works for simulated buses and bookings, but not reliable phone GPS access. For Vercel deployment, follow MANUAL-SETUP.md; shared Upstash Redis storage is required.
 
 ## Demonstration walkthrough
 
@@ -66,6 +66,7 @@ npm run build
 npm start
 ```
 
-Serve through HTTPS for real phone GPS. The server must remain running for live updates and shared state.
+Serve through HTTPS for real phone GPS. For local/Node hosting, the server must remain running. Vercel uses the included api functions and shared Redis storage; see MANUAL-SETUP.md.
 
 **Access is intentionally open for demonstration.** Driver, office and passenger identities are not authenticated. Before public operational deployment, add server-enforced roles, account/session management, persistent database transactions, request throttling and an appropriate driver-location retention policy. Do not use this demo as an authenticated live dispatch service.
+

@@ -1358,7 +1358,7 @@ export default function App() {
               <p>Loading buses, stops and your journey.</p>
               {!connected && (
                 <p className="microcopy">
-                  Make sure the demo server is running. We will reconnect automatically.
+                  We will retry automatically. If this continues, check the connection message above.
                 </p>
               )}
             </div>
@@ -1529,3 +1529,4 @@ function QrDialog({
     </dialog>
   );
 }
+
