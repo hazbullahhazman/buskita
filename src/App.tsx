@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import { planJourney } from "../shared/planner";
+>>>>>>> origin/master
 import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import {
@@ -57,6 +61,10 @@ import {
 import CampusMap from "./CampusMap";
 import { useDemo } from "./useDemo";
 
+<<<<<<< HEAD
+=======
+import { roleLinks } from "./role-links";
+>>>>>>> origin/master
 type Tab = "info" | "plan";
 const timeLabel = (seconds: number | null) =>
   seconds === null
@@ -78,11 +86,16 @@ const iconSize = 18;
 export default function App() {
   const demo = useDemo(),
     { state, connected, error, setError, busy, action } = demo;
+<<<<<<< HEAD
   const role = location.pathname.startsWith("/driver")
     ? "driver"
     : location.pathname.startsWith("/office")
       ? "office"
       : "passenger";
+=======
+  const links = roleLinks(location.href, import.meta.env.VITE_PUBLIC_URL);
+  const role = links.role;
+>>>>>>> origin/master
   const [userId, setUserId] = useState(() => {
     const raw = new URLSearchParams(location.search).get("user");
     return USERS.some((u) => u.id === raw) ? raw! : "amira";
@@ -90,7 +103,19 @@ export default function App() {
   const [selectedBus, setSelectedBus] = useState("BK01"),
     [pickup, setPickup] = useState(getInitialStop),
     [tab, setTab] = useState<Tab>("info"),
+<<<<<<< HEAD
     [placeId, setPlaceId] = useState("fke"),
+=======
+    [sheet, setSheet] = useState<"collapsed" | "half" | "full">("half"),
+    [placeId, setPlaceId] = useState("msi"),
+    [directStop, setDirectStop] = useState<string | null>(null),
+    [searchRadius, setSearchRadius] = useState(500),
+    [originChoice, setOriginChoice] = useState(""),
+    [originPin, setOriginPin] = useState<Point | null>(null),
+    [pinTarget, setPinTarget] = useState<"origin" | "destination">(
+      "destination",
+    ),
+>>>>>>> origin/master
     [pin, setPin] = useState<Point | null>(null),
     [picking, setPicking] = useState(false),
     [focus, setFocus] = useState<Point | null>(null),
@@ -104,6 +129,32 @@ export default function App() {
     [notice, setNotice] = useState(""),
     [gpsRunning, setGpsRunning] = useState(false),
     [now, setNow] = useState(Date.now());
+<<<<<<< HEAD
+=======
+  const [passengerFix, setPassengerFix] = useState<(Point & { accuracy: number; timestamp: number }) | null>(null);
+  const [passengerLocating, setPassengerLocating] = useState(false);
+  const passengerWatch = useRef<number | null>(null);
+  useEffect(() => () => { if (passengerWatch.current !== null) navigator.geolocation.clearWatch(passengerWatch.current); }, []);
+  function togglePassengerLocation() {
+    if (passengerWatch.current !== null) {
+      navigator.geolocation.clearWatch(passengerWatch.current); passengerWatch.current = null;
+      setPassengerLocating(false); setPassengerFix(null); return;
+    }
+    if (!window.isSecureContext || !navigator.geolocation) { setError("Your location requires HTTPS or localhost and browser location support."); return; }
+    setPassengerLocating(true); setError("");
+    let first = true;
+    passengerWatch.current = navigator.geolocation.watchPosition(position => {
+      const { latitude: lat, longitude: lng, accuracy } = position.coords;
+      if (![lat, lng, accuracy].every(Number.isFinite)) return;
+      setPassengerFix({ lat, lng, accuracy, timestamp: position.timestamp });
+      if (first) { setFocus({ lat, lng }); first = false; }
+    }, error => {
+      setError(error.code === 1 ? "Location permission denied. Allow location in your browser to show your position." : "Unable to get your location. Check GPS reception and try again.");
+      if (passengerWatch.current !== null) navigator.geolocation.clearWatch(passengerWatch.current);
+      passengerWatch.current = null; setPassengerLocating(false); setPassengerFix(null);
+    }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
+  }
+>>>>>>> origin/master
   const gpsWatch = useRef<number | null>(null),
     gpsBusy = useRef(false),
     lastGpsSent = useRef(0),
@@ -111,6 +162,7 @@ export default function App() {
   actionRef.current = action;
   const user = USERS.find((u) => u.id === userId)!,
     destination = pin || PLACES.find((p) => p.id === placeId)!.point,
+<<<<<<< HEAD
     destStop = nearestStop(destination),
     walk = Math.round(distance(destStop.point, destination));
   const bus = state?.buses.find((b) => b.id === selectedBus) || state?.buses[0];
@@ -124,6 +176,78 @@ export default function App() {
   const origin = new URL(import.meta.env.VITE_PUBLIC_URL || location.origin)
     .origin;
   const qrUrl = `${origin}/?stop=${qrStop}`;
+=======
+    destStop = directStop ? stopById(directStop) : nearestStop(destination),
+    walk = directStop ? 0 : Math.round(distance(destStop.point, destination));
+  const originPoint =
+    originPin || PLACES.find((p) => p.id === originChoice)?.point;
+  const originWalk = originPoint
+    ? Math.round(distance(originPoint, stopById(pickup).point))
+    : 0;
+  function acceptPin(point: Point) {
+    if (pinTarget === "origin") {
+      setOriginPin(point);
+      setOriginChoice("pin");
+      setPickup(nearestStop(point).id);
+    } else {
+      setPin(point);
+      setDirectStop(null);
+    }
+    setFocus(point);
+    setPicking(false);
+    showSection("plan");
+  }
+  const journey = planJourney({
+    origin: originPoint || stopById(pickup).point,
+    destination: directStop ? stopById(directStop).point : destination,
+    from: originPoint ? undefined : stopById(pickup),
+    to: directStop ? stopById(directStop) : undefined,
+    buses: connected ? state?.buses || [] : [],
+    requests: state?.requests || [],
+    count,
+    radius: searchRadius,
+    now,
+  });
+  const bestJourney = journey.options[0];
+  const trip = state?.requests.find(
+    (r) => r.userId === userId && ["waiting", "onboard"].includes(r.status),
+  );
+  const bus =
+    (role === "passenger" && trip ? state?.buses.find(b => b.id === trip.busId) : undefined) ||
+    (role === "passenger" && tab === "plan" ? bestJourney?.bus : undefined) ||
+    state?.buses.find((b) => b.id === selectedBus) ||
+    state?.buses[0];
+
+  const route = bus ? routeById(bus.routeId) : ROUTES[0];
+  const requestedBus = trip ? state?.buses.find(b => b.id === trip.busId) : undefined;
+  const summaryBus = requestedBus || bus;
+  const summaryStop = trip ? (trip.status === "onboard" ? trip.to : trip.from) : pickup;
+  const summaryEta = summaryBus && connected ? eta(summaryBus, summaryStop, now) : null;
+  const lastTrip = state?.requests
+    .filter((r) => r.userId === userId && r.status === "completed")
+    .at(-1);
+  const origin = new URL(links.passenger).origin;
+  const qrUrl = `${links.passenger}?stop=${qrStop}`;
+  const sheetScroll = useRef<HTMLDivElement>(null);
+  const dragStart = useRef<number | null>(null);
+  function toggleSection(section: Tab) {
+    if (tab === section && sheet !== "collapsed") { setSheet("collapsed"); setPicking(false); }
+    else showSection(section);
+  }
+  function showSection(section: Tab) {
+    setTab(section);
+    setSheet("full");
+    setPicking(false);
+    requestAnimationFrame(() => {
+      const scroller = sheetScroll.current;
+      const target = scroller?.querySelector<HTMLElement>(
+        section === "info" ? "#bus-overview" : "#trip-planner",
+      );
+      if (scroller && target)
+        scroller.scrollTo({ top: target.offsetTop, behavior: "smooth" });
+    });
+  }
+>>>>>>> origin/master
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
@@ -174,7 +298,13 @@ export default function App() {
         navigator.geolocation.clearWatch(gpsWatch.current);
       gpsWatch.current = null;
       setGpsRunning(false);
+<<<<<<< HEAD
       setToast("GPS sharing stopped. The last location will be marked as outdated.");
+=======
+      setToast(
+        "GPS sharing stopped. The last location will be marked as outdated.",
+      );
+>>>>>>> origin/master
       return;
     }
     if (!window.isSecureContext) {
@@ -234,10 +364,27 @@ export default function App() {
   }
   const selectStop = (id: string) => {
     if (picking) {
+<<<<<<< HEAD
       setPin(stopById(id).point);
       setPicking(false);
       setTab("plan");
     } else {
+=======
+      if (pinTarget === "origin") {
+        setOriginPin(null);
+        setOriginChoice("");
+        setPickup(id);
+      } else {
+        setPin(null);
+        setDirectStop(id);
+      }
+      setFocus(stopById(id).point);
+      setPicking(false);
+      showSection("plan");
+    } else {
+      setOriginChoice("");
+      setOriginPin(null);
+>>>>>>> origin/master
       setPickup(id);
       setFocus(atProgress(STOP_PROGRESS[id]));
     }
@@ -307,6 +454,7 @@ export default function App() {
           <section className="map-shell">
             <CampusMap
               buses={state.buses}
+<<<<<<< HEAD
               selectedBus={selectedBus}
               focus={focus}
               pin={pin}
@@ -316,6 +464,20 @@ export default function App() {
                 setPicking(false);
                 setTab("plan");
               }}
+=======
+              selectedBus={requestedBus?.id || bus.id}
+              requestedBusId={trip?.busId}
+              userLocation={passengerFix && now - passengerFix.timestamp < 30000 ? passengerFix : null}
+              locating={passengerLocating}
+              onLocate={togglePassengerLocation}
+              focus={focus}
+              pin={pinTarget === "origin" ? originPin : pin}
+              picking={picking}
+              pinLabel={
+                pinTarget === "origin" ? "starting point" : "destination"
+              }
+              onPin={acceptPin}
+>>>>>>> origin/master
               onBus={chooseBus}
               onStop={selectStop}
             />
@@ -327,10 +489,17 @@ export default function App() {
               </span>
             </div>
             <div className="mobile-bus-picker">
+<<<<<<< HEAD
               {state.buses.map((b) => (
                 <button
                   key={b.id}
                   aria-pressed={selectedBus === b.id}
+=======
+              {state.buses.filter(b => !trip || b.id === trip.busId).map((b) => (
+                <button
+                  key={b.id}
+                  aria-pressed={bus.id === b.id}
+>>>>>>> origin/master
                   onClick={() => chooseBus(b.id)}
                 >
                   <span style={{ background: routeById(b.routeId).color }} />
@@ -339,6 +508,7 @@ export default function App() {
                 </button>
               ))}
             </div>
+<<<<<<< HEAD
             <div className={`journey-dock ${picking ? "dock-picking" : ""}`}>
               <div className="dock-handle" />
               <div
@@ -423,6 +593,146 @@ export default function App() {
                 </div>
               ) : tab === "info" ? (
                 <div className="dock-content">
+=======
+            <div
+              className={`journey-dock sheet-${sheet} ${picking ? "dock-picking" : ""}`}
+            >
+              <div className="sheet-toolbar">
+                <button
+                  className="sheet-grip"
+                  aria-label={
+                    sheet === "collapsed"
+                      ? "Expand bus panel"
+                      : "Collapse bus panel"
+                  }
+                  aria-expanded={sheet !== "collapsed"}
+                  aria-controls="journey-sections"
+                  onPointerDown={(e) => {
+                    dragStart.current = e.clientY;
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                  }}
+                  onPointerUp={(e) => {
+                    if (dragStart.current === null) return;
+                    const delta = e.clientY - dragStart.current;
+                    if (Math.abs(delta) > 25)
+                      setSheet(delta > 0 ? "collapsed" : "full");
+                    else
+                      setSheet((current) =>
+                        current === "collapsed" ? "half" : "collapsed",
+                      );
+                    dragStart.current = null;
+                  }}
+                  onPointerCancel={() => {
+                    dragStart.current = null;
+                  }}
+                  onClick={(event) => {
+                    if (event.detail === 0)
+                      setSheet((current) =>
+                        current === "collapsed" ? "half" : "collapsed",
+                      );
+                  }}
+                >
+                  <span className="grip-line" />
+                  <span>
+                    {sheet === "collapsed" ? "Show bus info" : "Drag to resize"}
+                  </span>
+                </button>
+                <button
+                  className="sheet-map-toggle"
+                  onClick={() =>
+                    setSheet((current) =>
+                      current === "collapsed" ? "half" : "collapsed",
+                    )
+                  }
+                >
+                  {sheet === "collapsed" ? "Show buses" : "Show map"}{" "}
+                  <ChevronDown size={16} />
+                </button>
+              </div>
+              <div className="compact-bus-summary" aria-label="Bus journey summary">
+                <span className="summary-bus-icon" style={{ background: routeById(summaryBus!.routeId).color }}><BusIcon size={23} /></span>
+                <div className="summary-bus-copy">
+                  <strong>{summaryBus!.id} · {trip ? "Your requested bus" : "Selected bus"}</strong>
+                  <span>{trip?.status === "onboard" ? "On board · to " : "Pickup · "}{stopById(summaryStop).name}</span>
+                  <small>{!connected ? "Reconnecting" : summaryBus!.mode === "demo" ? "Simulation estimate" : "GPS estimate"}</small>
+                </div>
+                <div className="summary-bus-eta"><strong>{summaryEta === null ? "—" : summaryEta < 30 ? "Due" : `${Math.ceil(summaryEta / 60)} min`}</strong><small>{summaryEta === null ? "ETA unavailable" : trip?.status === "onboard" ? "to destination" : "to pickup"}</small></div>
+              </div>
+              <div
+                className="sheet-scroll"
+                id="journey-sections"
+                ref={sheetScroll}
+              >
+                <section
+                  id="bus-overview"
+                  hidden={tab !== "info"}
+                  className="bus-overview"
+                  aria-label="Bus arrivals"
+                >
+                  <div className="section-label">
+                    <BusIcon size={15} /> BUS INFO
+                  </div>
+                  <h2>Next buses at {stopById(pickup).name}</h2>
+                  <p>
+                    Estimated arrivals ·{" "}
+                    {state.buses.some((b) => b.mode === "demo")
+                      ? "Includes simulated buses"
+                      : "Live GPS updates"}
+                  </p>
+                  <div className="arrival-list">
+                    {[...state.buses]
+                      .sort(
+                        (a, b) =>
+                          (eta(a, pickup, now) ?? Infinity) -
+                          (eta(b, pickup, now) ?? Infinity),
+                      )
+                      .map((b, i) => {
+                        const arrival = connected ? eta(b, pickup, now) : null;
+                        return (
+                          <button
+                            key={b.id}
+                            aria-pressed={b.id === bus.id}
+                            onClick={() => chooseBus(b.id)}
+                          >
+                            <span
+                              className="arrival-route-dot"
+                              style={{ background: routeById(b.routeId).color }}
+                            />
+                            <span>
+                              <strong>
+                                {b.id} · {routeById(b.routeId).name}
+                              </strong>
+                              <small>
+                                {i === 0 && arrival !== null
+                                  ? "Next arrival · "
+                                  : ""}
+                                {b.capacity - occupied(b.id, state.requests)}{" "}
+                                seats · towards {nextStop(b).name}
+                              </small>
+                            </span>
+                            <strong>
+                              {arrival === null
+                                ? "Unavailable"
+                                : arrival < 30
+                                  ? "Due"
+                                  : `${Math.ceil(arrival / 60)} min`}
+                            </strong>
+                          </button>
+                        );
+                      })}
+                  </div>
+                  <p className="microcopy">
+                    All demo buses shown. These are arrival estimates, not a
+                    published UTM timetable.
+                  </p>
+                </section>
+
+                <section
+                  className="dock-content"
+                  aria-label="Selected bus information"
+                  hidden={tab !== "info"}
+                >
+>>>>>>> origin/master
                   <div className="section-label">
                     <MapPin size={14} /> YOUR PICKUP STOP
                   </div>
@@ -431,6 +741,11 @@ export default function App() {
                       aria-label="Pickup stop"
                       value={pickup}
                       onChange={(e) => {
+<<<<<<< HEAD
+=======
+                        setOriginChoice("");
+                        setOriginPin(null);
+>>>>>>> origin/master
                         setPickup(e.target.value);
                         setFocus(atProgress(STOP_PROGRESS[e.target.value]));
                       }}
@@ -469,21 +784,35 @@ export default function App() {
                   <div className="dock-meta">
                     <span>
                       <Users size={15} />
+<<<<<<< HEAD
                       {bus.capacity - occupied(bus.id, state.requests)} seats available
                     </span>
                     <span className="green">
                       <span className="live-dot" />
                       {bus.mode === "demo" ? "Simulation" : "GPS telefon"}
+=======
+                      {bus.capacity - occupied(bus.id, state.requests)} seats
+                      available
+                    </span>
+                    <span className="green">
+                      <span className="live-dot" />
+                      {bus.mode === "demo" ? "Simulation" : "Phone GPS"}
+>>>>>>> origin/master
                     </span>
                   </div>
                   <button
                     className="primary-button"
+<<<<<<< HEAD
                     onClick={() => setTab("plan")}
+=======
+                    onClick={() => showSection("plan")}
+>>>>>>> origin/master
                   >
                     Plan your journey <ArrowRight size={17} />
                   </button>
                   {lastTrip && (
                     <div className="completed-note">
+<<<<<<< HEAD
                       <CheckCircle2 size={14} /> Your last trip is complete. Thank you!
                     </div>
                   )}
@@ -611,6 +940,356 @@ export default function App() {
                   </div>
                 </div>
               )}
+=======
+                      <CheckCircle2 size={14} /> Your last trip is complete.
+                      Thank you!
+                    </div>
+                  )}
+                </section>
+                <section
+                  id="trip-planner"
+                  aria-label="Plan a trip"
+                  hidden={tab !== "plan"}
+                >
+                  <h2 className="planner-title">
+                    <RouteIcon size={19} /> Plan a trip
+                  </h2>
+                  {trip && (
+                    <details className="dock-content active-trip current-journey">
+                      <summary>
+                        Current journey ·{" "}
+                        {trip.status === "onboard" ? "On board" : "Waiting"} ·
+                        View details
+                      </summary>
+                      <div className="section-label">
+                        <span className="live-dot" />
+                        {trip.status === "waiting"
+                          ? "REQUEST RECEIVED"
+                          : "YOU ARE ON BOARD"}
+                      </div>
+                      <h2>
+                        {trip.status === "waiting"
+                          ? "Your bus is on its way."
+                          : "Enjoy your journey."}
+                      </h2>
+                      <p>
+                        {stopById(trip.from).name} <ArrowRight size={13} />{" "}
+                        {stopById(trip.to).name}
+                      </p>
+                      <div className="trip-summary">
+                        <span>
+                          <BusIcon size={18} />
+                          {trip.busId}
+                        </span>
+                        <span>
+                          <Users size={17} />
+                          {trip.count} passengers
+                        </span>
+                        <strong>
+                          {timeLabel(
+                            eta(
+                              state.buses.find((b) => b.id === trip.busId)!,
+                              trip.status === "waiting" ? trip.from : trip.to,
+                              now,
+                            ),
+                          )}{" "}
+                          <small>min estimated</small>
+                        </strong>
+                      </div>
+                      <p className="microcopy">
+                        {trip.status === "waiting"
+                          ? "Board once the driver confirms arrival. Seats are subject to availability."
+                          : "Your driver will confirm arrival at your destination."}
+                      </p>
+                      {trip.status === "onboard" && (
+                        <button
+                          className="primary-button"
+                          disabled={
+                            busy || !connected || !!trip.stopRequestedAt
+                          }
+                          onClick={() =>
+                            doAction(
+                              {
+                                type: "request-stop",
+                                requestId: trip.id,
+                                userId,
+                              },
+                              "Stop request sent to the driver.",
+                            )
+                          }
+                        >
+                          {trip.stopRequestedAt
+                            ? "Driver notified — stop requested"
+                            : `Notify driver: stop at ${stopById(trip.to).name}`}
+                        </button>
+                      )}
+                    </details>
+                  )}
+                  <div className="dock-content plan-content">
+                    {trip && (
+                      <div className="planning-hint">
+                        <p>You have an active journey. Cancel it before sending a new request.</p>
+                        <button className="outline-button full" disabled={busy || !connected}
+                          onClick={() => doAction({ type: "cancel", requestId: trip.id, userId }, trip.status === "onboard" ? "Journey cancelled. You can make a new request." : "Request cancelled. You can make a new request.")}>
+                          <X size={16} /> {busy ? "Cancelling…" : trip.status === "onboard" ? "Leave journey" : "Cancel request"}
+                        </button>
+                        {trip.status === "onboard" && <small>Leaving removes you from the demo bus passenger count. It does not confirm arrival at your destination.</small>}
+                      </div>
+                    )}
+                    <div className="journey-inputs">
+                      <div className="journey-field">
+                        <span className="origin-dot" />
+                        <label htmlFor="pickup">From</label>
+                        <select
+                          id="pickup"
+                          value={
+                            originChoice ? `place:${originChoice}` : pickup
+                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setOriginPin(null);
+                            if (value.startsWith("place:")) {
+                              const id = value.slice(6);
+                              const point = PLACES.find(
+                                (p) => p.id === id,
+                              )!.point;
+                              setOriginChoice(id);
+                              setPickup(nearestStop(point).id);
+                              setFocus(point);
+                            } else {
+                              setOriginChoice("");
+                              setPickup(value);
+                              setFocus(stopById(value).point);
+                            }
+                          }}
+                        >
+                          {originPin && (
+                            <option value="place:pin">
+                              Your pinned starting point
+                            </option>
+                          )}
+                          <optgroup label="Campus places">
+                            {PLACES.map((p) => (
+                              <option key={p.id} value={`place:${p.id}`}>
+                                {p.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                          {STOPS.map((s) => (
+                            <option value={s.id} key={s.id}>
+                              {s.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="journey-field">
+                        <MapPin size={17} />
+                        <label htmlFor="destination">To</label>
+                        <select
+                          id="destination"
+                          value={
+                            directStop
+                              ? `stop:${directStop}`
+                              : pin
+                                ? "pin"
+                                : placeId
+                          }
+                          onChange={(e) => {
+                            if (e.target.value.startsWith("stop:")) {
+                              const id = e.target.value.slice(5);
+                              setDirectStop(id);
+                              setPin(null);
+                              setFocus(stopById(id).point);
+                              return;
+                            }
+                            setDirectStop(null);
+                            setPlaceId(e.target.value);
+                            setPin(null);
+                            setFocus(
+                              PLACES.find((p) => p.id === e.target.value)!
+                                .point,
+                            );
+                          }}
+                        >
+                          {pin && (
+                            <option value="pin">Your pinned destination</option>
+                          )}
+                          <optgroup label="Choose a bus stop">
+                            {STOPS.map((s) => (
+                              <option key={s.id} value={`stop:${s.id}`}>
+                                {s.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                          {PLACES.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <button
+                      className="pin-button"
+                      onClick={() => {
+                        setPinTarget("origin");
+                        setPicking(true);
+                        setSheet("collapsed");
+                      }}
+                    >
+                      <MapPin size={15} /> Pin your starting point on the map
+                    </button>
+                    <div className="walking-note">
+                      <Footprints size={19} />
+                      <div>
+                        Board at <strong>{stopById(pickup).name}</strong>
+                        <small>
+                          {originWalk} m from starting point · straight-line
+                          estimate
+                        </small>
+                      </div>
+                    </div>
+                    <button
+                      className={`pin-button ${picking ? "selected" : ""}`}
+                      onClick={() => {
+                        setPinTarget("destination");
+                        setPicking(!picking);
+                        setSheet(picking ? "full" : "collapsed");
+                      }}
+                    >
+                      <MapPin size={15} />
+                      {picking
+                        ? "Cancel pin selection"
+                        : "Or pin your destination on the map"}
+                      <ArrowUpRight size={14} />
+                    </button>
+                    <div className="walking-note">
+                      <Footprints size={19} />
+                      <div>
+                        Get off at <strong>{destStop.name}</strong>
+                        <small>
+                          ±{walk} m to destination · straight-line distance
+                        </small>
+                      </div>
+                    </div>
+                    <label className="field-label" htmlFor="stop-radius">
+                      Nearest-stop search radius
+                    </label>
+                    <select
+                      id="stop-radius"
+                      className="standalone-select"
+                      value={searchRadius}
+                      onChange={(e) => setSearchRadius(Number(e.target.value))}
+                    >
+                      <option value={300}>300 metres</option>
+                      <option value={500}>500 metres</option>
+                      <option value={800}>800 metres</option>
+                    </select>
+                    <section
+                      className="journey-recommendation"
+                      aria-label="Recommended journey"
+                    >
+                      <h3>Fastest estimated journey</h3>
+                      {bestJourney ? (
+                        <>
+                          <strong>
+                            {bestJourney.bus.id} · about{" "}
+                            {Math.ceil(bestJourney.totalSeconds / 60)} min total
+                          </strong>
+                          <p>
+                            {journey.from.name} → {journey.to.name}
+                          </p>
+                          <p>
+                            Walk {Math.ceil(journey.walkingSeconds / 60)} min ·
+                            wait {Math.ceil(bestJourney.waitSeconds / 60)} min ·
+                            ride {Math.ceil(bestJourney.rideSeconds / 60)} min ·
+                            walk {Math.ceil(bestJourney.finalWalkSeconds / 60)}{" "}
+                            min
+                          </p>
+                          <small>
+                            Compared {journey.options.length} available buses
+                            serving your closest stops. The driver notification
+                            uses {bestJourney.bus.id}.
+                          </small>
+                        </>
+                      ) : (
+                        <p role="status">{journey.reason}</p>
+                      )}
+                      <p className="microcopy">
+                        Closest stop first, then lowest estimated total time.
+                        Walking uses straight-line distance at 1.2 m/s; check
+                        gates and pedestrian access. All demo buses currently
+                        share one mapped road loop.
+                      </p>
+                    </section>
+                    <div className="booking-options">
+                      <div>
+                        <span className="section-label">PASSENGERS</span>
+                        <div className="stepper">
+                          {[1, 2, 3].map((n) => (
+                            <button
+                              key={n}
+                              aria-label={`${n} passengers`}
+                              aria-pressed={count === n}
+                              onClick={() => setCount(n)}
+                            >
+                              {n}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="booking-estimate">
+                        <span className="section-label">ESTIMATED PICKUP</span>
+                        <strong>
+                          {timeLabel(estimate)} <small>min</small>
+                        </strong>
+                      </div>
+                    </div>
+                    <button
+                      className="primary-button"
+                      disabled={
+                        busy ||
+                        !connected ||
+                        pickup === destStop.id ||
+                        !!trip ||
+                        !bestJourney ||
+                        estimate === null
+                      }
+                      onClick={() =>
+                        doAction(
+                          {
+                            type: "book",
+                            busId: bestJourney?.bus.id,
+                            userId,
+                            from: journey.from.id,
+                            to: journey.to.id,
+                            count,
+                          },
+                          "Driver notified of your pickup and destination stop.",
+                        )
+                      }
+                    >
+                      <span>
+                        {trip
+                          ? "Finish current journey to notify driver"
+                          : pickup === destStop.id
+                            ? "Choose a different destination stop"
+                            : !bestJourney
+                              ? "No suitable journey available"
+                              : busy
+                                ? "Sending…"
+                                : `Notify driver · ${bestJourney.bus.id}`}
+                      </span>
+                      <ArrowRight size={17} />
+                    </button>
+                    <div className="microcopy center">
+                      Sends your pickup, drop-off and passenger count to the
+                      driver. It does not change the bus route.
+                    </div>
+                  </div>
+                </section>
+              </div>
+>>>>>>> origin/master
             </div>
           </section>
           <aside className="route-sidebar">
@@ -626,7 +1305,11 @@ export default function App() {
                 <BusCard
                   key={b.id}
                   bus={b}
+<<<<<<< HEAD
                   active={b.id === selectedBus}
+=======
+                  active={b.id === bus.id}
+>>>>>>> origin/master
                   etaValue={eta(b, pickup, now)}
                   seats={b.capacity - occupied(b.id, state.requests)}
                   onClick={() => chooseBus(b.id)}
@@ -664,7 +1347,11 @@ export default function App() {
                           ? "Your stop"
                           : s.suggested
                             ? "Proposed · spacing ≤500 m"
+<<<<<<< HEAD
                             : "Prototype coordinates"}
+=======
+                            : "OSM mapped stop"}
+>>>>>>> origin/master
                       </small>
                     </span>
                     {pickup === id && <MapPin size={14} />}
@@ -677,7 +1364,12 @@ export default function App() {
               <p>
                 Demo routes and stops.
                 <br />
+<<<<<<< HEAD
                 Three bus colours share one temporary route. Not yet field-verified.
+=======
+                Three bus colours share one temporary route. Not yet
+                field-verified.
+>>>>>>> origin/master
               </p>
             </div>
           </aside>
@@ -703,7 +1395,12 @@ export default function App() {
               A smoother journey<span>.</span>
             </h1>
             <p>
+<<<<<<< HEAD
               Welcome, {bus.driver}. Keep your focus on the road, with trip details at a glance.
+=======
+              Welcome, {bus.driver}. Keep your focus on the road, with trip
+              details at a glance.
+>>>>>>> origin/master
             </p>
           </div>
           <label className="bus-switch">
@@ -909,7 +1606,18 @@ export default function App() {
                   <p key={r.id}>
                     <ArrowDownLeft size={15} />
                     {r.count} passengers get off at{" "}
+<<<<<<< HEAD
                     <strong>{stopById(r.to).name}</strong>
+=======
+                    <strong>
+                      {stopById(r.to).name}
+                      {r.stopRequestedAt && (
+                        <small className="stop-request-badge">
+                          Stop requested
+                        </small>
+                      )}
+                    </strong>
+>>>>>>> origin/master
                   </p>
                 ))}
               </div>
@@ -1121,7 +1829,13 @@ export default function App() {
           <section className="white-panel requests-panel">
             <div className="section-top">
               <h2>Journey activity</h2>
+<<<<<<< HEAD
               <span className="count-pill">{state.requests.length} records</span>
+=======
+              <span className="count-pill">
+                {state.requests.length} records
+              </span>
+>>>>>>> origin/master
             </div>
             {state.requests.length ? (
               <div className="activity-list">
@@ -1245,6 +1959,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <aside className="app-rail">
+<<<<<<< HEAD
         <a className="brand-mark" href="/" aria-label="BasKita home">
           <BusIcon size={25} strokeWidth={1.7} />
         </a>
@@ -1284,6 +1999,47 @@ export default function App() {
         >
           <QrCode size={21} />
         </button>
+=======
+        <a className="brand-mark" href={links[role]} aria-label="BasKita home">
+          <BusIcon size={25} strokeWidth={1.7} />
+        </a>
+        <nav
+          aria-label={
+            role === "passenger" ? "Passenger navigation" : `${role} navigation`
+          }
+        >
+          {role === "passenger" ? (
+            <>
+              <button
+                className={tab === "info" ? "active" : ""}
+                aria-pressed={tab === "info"}
+                onClick={() => toggleSection("info")}
+              >
+                <BusIcon size={21} />
+                <span>Bus info</span>
+              </button>
+              <button
+                className={tab === "plan" ? "active" : ""}
+                aria-pressed={tab === "plan"}
+                onClick={() => toggleSection("plan")}
+              >
+                <RouteIcon size={21} />
+                <span>Plan a trip</span>
+              </button>
+            </>
+          ) : role === "driver" ? (
+            <a className="active" href={links.driver} aria-current="page">
+              <Navigation size={21} />
+              <span>Driver</span>
+            </a>
+          ) : (
+            <a className="active" href={links.office} aria-current="page">
+              <LayoutDashboard size={21} />
+              <span>Office</span>
+            </a>
+          )}
+        </nav>
+>>>>>>> origin/master
         <div className="rail-bottom">
           <Leaf size={19} />
           <span>
@@ -1295,7 +2051,11 @@ export default function App() {
       </aside>
       <div className="app-body">
         <header className="topbar">
+<<<<<<< HEAD
           <a className="wordmark" href="/">
+=======
+          <a className="wordmark" href={links[role]}>
+>>>>>>> origin/master
             bas<span>kita</span>
             <small>UTM</small>
           </a>
@@ -1358,7 +2118,12 @@ export default function App() {
               <p>Loading buses, stops and your journey.</p>
               {!connected && (
                 <p className="microcopy">
+<<<<<<< HEAD
                   We will retry automatically. If this continues, check the connection message above.
+=======
+                  We will retry automatically. If this continues, check the
+                  connection message above.
+>>>>>>> origin/master
                 </p>
               )}
             </div>
@@ -1427,6 +2192,7 @@ export default function App() {
               </span>
               <ArrowUpRight size={16} />
             </a>
+<<<<<<< HEAD
             <a href={`${origin}/driver`} target="_blank" rel="noreferrer">
               <span>
                 <Navigation size={16} /> Driver
@@ -1439,6 +2205,8 @@ export default function App() {
               </span>
               <ArrowUpRight size={16} />
             </a>
+=======
+>>>>>>> origin/master
           </div>
           <p className="microcopy">
             {["localhost", "127.0.0.1"].includes(new URL(origin).hostname)
@@ -1529,4 +2297,7 @@ function QrDialog({
     </dialog>
   );
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master

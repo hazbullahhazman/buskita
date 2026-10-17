@@ -147,7 +147,11 @@ small {
   width: 100%;
   margin-top: 57px;
 }
+<<<<<<< HEAD
 .app-rail nav a {
+=======
+.app-rail nav :is(a, button) {
+>>>>>>> origin/master
   height: 60px;
   display: flex;
   flex-direction: column;
@@ -157,16 +161,28 @@ small {
   color: #859087;
   border-radius: 11px;
 }
+<<<<<<< HEAD
 .app-rail nav a span {
   font-size: 9px;
   font-weight: 600;
 }
 .app-rail nav a:hover,
+=======
+.app-rail nav :is(a, button) span {
+  font-size: 9px;
+  font-weight: 600;
+}
+.app-rail nav :is(a, button):hover,
+>>>>>>> origin/master
 .app-rail > button:hover {
   background: #f6f7f3;
   color: var(--maroon);
 }
+<<<<<<< HEAD
 .app-rail nav a.active {
+=======
+.app-rail nav :is(a, button).active {
+>>>>>>> origin/master
   color: var(--maroon);
   background: #f8f0f1;
 }
@@ -1900,13 +1916,21 @@ tr:last-child td {
     justify-content: space-around;
     flex: 1;
   }
+<<<<<<< HEAD
   .app-rail nav a {
+=======
+  .app-rail nav :is(a, button) {
+>>>>>>> origin/master
     height: 50px;
     min-width: 75px;
     gap: 5px;
     border-radius: 9px;
   }
+<<<<<<< HEAD
   .app-rail nav a span {
+=======
+  .app-rail nav :is(a, button) span {
+>>>>>>> origin/master
     font-size: 9px;
   }
   .app-rail > button {
@@ -2294,3 +2318,292 @@ tr:last-child td {
     top: 176px;
   }
 }
+<<<<<<< HEAD
+=======
+
+/* Passenger information stays above the planner in one scrollable panel. */
+.journey-dock {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - 40px);
+  overflow: hidden;
+}
+.sheet-grip {
+  display: none;
+}
+.dock-tabs {
+  flex-shrink: 0;
+}
+.dock-tabs button[aria-pressed="true"] {
+  color: var(--maroon);
+  border-color: var(--maroon);
+}
+.sheet-scroll {
+  position: relative;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  min-height: 0;
+  scroll-padding-top: 8px;
+}
+.bus-overview {
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.bus-overview h2 {
+  font-size: 18px;
+  line-height: 1.35;
+  margin: 10px 0 6px;
+}
+.bus-overview > p {
+  font-size: 11px;
+  color: #68786e;
+  line-height: 1.5;
+}
+.arrival-list {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0;
+}
+.arrival-list button {
+  display: grid;
+  grid-template-columns: 6px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 10px;
+  min-height: 64px;
+}
+.arrival-list button[aria-pressed="true"] {
+  background: #faf4f6;
+  border-color: #b88b98;
+}
+.arrival-list strong {
+  font-size: 11px;
+}
+.arrival-list button > strong {
+  color: var(--maroon);
+  font-size: 12px;
+}
+.arrival-list small {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  line-height: 1.4;
+  color: #68786e;
+}
+.arrival-route-dot {
+  width: 6px;
+  height: 28px;
+  border-radius: 4px;
+}
+.planner-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 19px;
+  padding: 20px 22px 0;
+  margin: 0;
+}
+#trip-planner {
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 600px) {
+  .passenger .page-heading {
+    margin-bottom: 14px;
+  }
+  .passenger .map-shell {
+    height: max(420px, calc(100dvh - 200px));
+  }
+  .passenger .page-footer {
+    padding-bottom: 130px;
+  }
+  .passenger .journey-dock {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 90px - env(safe-area-inset-bottom));
+    border-radius: 20px 20px 0 0;
+    z-index: 900;
+    height: 48dvh;
+    transition: height 0.25s ease;
+    transform: none;
+  }
+  .passenger .sheet-full {
+    height: 78dvh;
+  }
+  .passenger .sheet-collapsed {
+    height: 94px;
+  }
+  .passenger .sheet-collapsed .sheet-scroll {
+    visibility: hidden;
+  }
+  .sheet-grip {
+    display: flex;
+    flex: 0 0 44px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    touch-action: none;
+    user-select: none;
+    cursor: ns-resize;
+    font-size: 10px;
+    color: #67766b;
+    width: 100%;
+  }
+  .grip-line {
+    width: 36px;
+    height: 4px;
+    border-radius: 4px;
+    background: #bcc7b9;
+  }
+  .sheet-grip:focus-visible {
+    outline: 2px solid var(--maroon);
+    outline-offset: -4px;
+  }
+  .passenger .dock-tabs button {
+    min-height: 48px;
+    font-size: 12px;
+    padding: 10px;
+  }
+  .passenger .sheet-scroll {
+    padding-bottom: 20px;
+  }
+  .passenger .dock-content {
+    padding: 18px 20px;
+  }
+  .passenger .dock-picking {
+    height: 94px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .passenger .dock-picking .sheet-scroll {
+    visibility: hidden;
+  }
+  .app-rail {
+    height: calc(64px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .app-body {
+    margin-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .passenger .journey-dock {
+    transition: none;
+  }
+}
+
+.sheet-toolbar {
+  display: none;
+}
+@media (max-width: 600px) {
+  .sheet-toolbar {
+    display: flex;
+    flex: 0 0 44px;
+    align-items: center;
+    padding: 0 14px;
+    gap: 12px;
+  }
+  .sheet-toolbar .sheet-grip {
+    flex: 1;
+    min-height: 44px;
+  }
+  .sheet-map-toggle {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    min-height: 36px;
+    border-radius: 18px;
+    background: #f5edef;
+    color: var(--maroon);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .sheet-collapsed .sheet-map-toggle svg {
+    transform: rotate(180deg);
+  }
+  .passenger .journey-dock {
+    height: 42dvh;
+  }
+  .passenger .sheet-full {
+    height: 78dvh;
+  }
+  .passenger .sheet-collapsed,
+  .passenger .dock-picking {
+    height: 94px;
+  }
+  .passenger .page-heading .eyebrow,
+  .passenger .page-heading p {
+    display: none;
+  }
+  .passenger .page-heading h1 {
+    font-size: 25px;
+    margin: 0;
+  }
+  .passenger.main-content {
+    padding-top: 12px;
+  }
+  .passenger .bus-overview {
+    padding-top: 12px;
+  }
+  .passenger .bus-overview > .section-label {
+    display: none;
+  }
+  .passenger .bus-overview h2 {
+    margin-top: 0;
+    font-size: 17px;
+  }
+}
+
+/* Role navigation is separate from the passenger sheet; only one section is visible. */
+.sheet-scroll [hidden] {
+  display: none !important;
+}
+@media (max-width: 600px) {
+  .app-rail nav > button {
+    flex: 1;
+  }
+  .passenger .sheet-collapsed,
+  .passenger .dock-picking {
+    height: 46px;
+  }
+}
+.stop-request-badge { display: block; margin-top: 5px; color: #752f42; background: #fae9ed; border-radius: 5px; padding: 4px 8px; font-size: 12px; }
+.journey-recommendation { margin: 16px 0; padding: 16px; border: 1px solid #d5e4d7; border-radius: 12px; background: #f2f7f0; }
+.journey-recommendation h3 { font-size: 14px; margin: 0 0 10px; }
+.journey-recommendation > strong { font-size: 16px; color: #35674c; }
+.journey-recommendation p { font-size: 12px; line-height: 1.6; margin: 8px 0; }
+.journey-recommendation small { font-size: 11px; line-height: 1.5; display: block; }
+.current-journey { margin: 16px 20px 0; padding: 12px !important; border: 1px solid #e5dedf; border-radius: 10px; background: #fcf8f9; }
+.current-journey summary { cursor: pointer; color: #752f42; font-size: 12px; font-weight: 600; line-height: 1.6; }
+.current-journey[open] summary { margin-bottom: 16px; }
+.planning-hint { font-size: 12px; line-height: 1.6; margin: 0 0 16px; color: #68786e; }
+.compact-bus-summary { display: flex; align-items: center; gap: 11px; padding: 12px 16px; flex-shrink: 0; border-bottom: 1px solid var(--line); min-height: 86px; background: #fff; }
+.summary-bus-icon { display: grid; place-items: center; height: 40px; width: 40px; flex-shrink: 0; border-radius: 12px; color: white; }
+.summary-bus-copy { min-width: 0; flex: 1; display: grid; gap: 4px; }
+.summary-bus-copy strong { font-size: 12px; }
+.summary-bus-copy span { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.summary-bus-copy small, .summary-bus-eta small { font-size: 10px; color: #738073; }
+.summary-bus-eta { display: grid; gap: 5px; text-align: right; flex-shrink: 0; }
+.summary-bus-eta strong { color: var(--maroon); font-size: 19px; }
+.requested-bus-marker { filter: drop-shadow(0 0 6px #f1b829); }
+.requested-bus-marker b { background: #fff4cb; border: 1px solid #d9ae36; color: #4c3318; white-space: nowrap; align-self: center; }
+@media (max-width: 600px) {
+  .passenger .sheet-collapsed, .passenger .dock-picking { height: 132px; }
+}
+.muted-bus-marker b { display: none; }
+.passenger-location-marker > span { display: block; width: 20px; height: 20px; border-radius: 50%; background: #287de0; border: 3px solid white; box-shadow: 0 1px 7px #18395755; }
+.passenger-location-marker b { display: block; width: 28px; text-align: center; background: white; border-radius: 4px; color: #1765b8; font-size: 10px; }
+.passenger-gps-control { position: absolute; z-index: 550; top: 12px; right: 64px; display: grid; justify-items: end; gap: 5px; }
+.passenger-gps-control button { display: flex; align-items: center; gap: 6px; padding: 10px; min-height: 40px; background: white; border: 1px solid #d9e2d5; border-radius: 9px; font-size: 11px; color: #1765b8; }
+.passenger-gps-control small { padding: 4px 6px; background: #fffffff0; border-radius: 4px; font-size: 10px; }
+@media (max-width: 600px) { .passenger-gps-control { top: 176px; left: 12px; right: auto; justify-items: start; } }
+.campus-map.picking .passenger-gps-control { display: none; }
+>>>>>>> origin/master

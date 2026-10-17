@@ -38,7 +38,11 @@ for (const [url, api] of [
   });
 }
 app.use(express.static("dist"));
+<<<<<<< HEAD
 for (const route of ["/driver", "/office"])
+=======
+for (const route of ["/passenger", "/driver", "/office"])
+>>>>>>> origin/master
   app.get(route, (_req, res) => res.sendFile(path.resolve("dist/index.html")));
 app.listen(port, "127.0.0.1", () =>
   console.log(`Cloud integration harness: ${port}`),

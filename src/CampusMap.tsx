@@ -10,8 +10,13 @@ declare global {
     initBasKita?: () => void;
   }
 }
+<<<<<<< HEAD
 const busSvg = (color: string) =>
   `<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><rect x="2" y="2" width="40" height="40" rx="14" fill="${color}" stroke="white" stroke-width="3"/><g fill="none" stroke="white" stroke-width="1.8"><rect x="14" y="11" width="16" height="21" rx="4"/><path d="M14 23h16M18 11v12M26 11v12M16 32v3M28 32v3"/><path d="M17 28h2m6 0h2"/></g></svg>`;
+=======
+const busSvg = (color: string, requested = false) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><rect x="2" y="2" width="40" height="40" rx="14" fill="${color}" stroke="${requested ? "#f7ca59" : "white"}" stroke-width="${requested ? 4 : 3}"/><g fill="none" stroke="white" stroke-width="1.8"><rect x="14" y="11" width="16" height="21" rx="4"/><path d="M14 23h16M18 11v12M26 11v12M16 32v3M28 32v3"/><path d="M17 28h2m6 0h2"/></g></svg>`;
+>>>>>>> origin/master
 let googlePromise: Promise<any> | null = null;
 function loadGoogle(key: string) {
   if (window.google?.maps) return Promise.resolve(window.google.maps);
@@ -35,9 +40,20 @@ function loadGoogle(key: string) {
 type Props = {
   buses: Bus[];
   selectedBus: string;
+<<<<<<< HEAD
   focus: Point | null;
   pin: Point | null;
   picking: boolean;
+=======
+  requestedBusId?: string;
+  userLocation?: (Point & { accuracy: number }) | null;
+  locating?: boolean;
+  onLocate?: () => void;
+  focus: Point | null;
+  pin: Point | null;
+  picking: boolean;
+  pinLabel?: string;
+>>>>>>> origin/master
   onPin: (p: Point) => void;
   onBus: (id: string) => void;
   onStop: (id: string) => void;
@@ -51,6 +67,10 @@ export default function CampusMap(props: Props) {
     busMarkers = useRef<Record<string, any>>({}),
     routeLayer = useRef<any>(null),
     pinMarker = useRef<any>(null);
+<<<<<<< HEAD
+=======
+  const userMarker = useRef<any>(null), accuracyCircle = useRef<any>(null);
+>>>>>>> origin/master
   const [provider, setProvider] = useState("Loading map…"),
     [ready, setReady] = useState(0);
   current.current = props;
@@ -64,7 +84,11 @@ export default function CampusMap(props: Props) {
           const maps = await loadGoogle(key);
           if (!active || !element.current) return;
           gm.current = new maps.Map(element.current, {
+<<<<<<< HEAD
             center: { lat: 1.5574, lng: 103.6384 },
+=======
+            center: { lat: 1.5603, lng: 103.6375 },
+>>>>>>> origin/master
             zoom: 15,
             disableDefaultUI: true,
             clickableIcons: false,
@@ -137,7 +161,11 @@ export default function CampusMap(props: Props) {
         zoomControl: false,
         attributionControl: true,
         scrollWheelZoom: true,
+<<<<<<< HEAD
       }).setView([1.5574, 103.6384], 15);
+=======
+      }).setView([1.5603, 103.6375], 16);
+>>>>>>> origin/master
       leaflet.current = map;
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
@@ -182,9 +210,13 @@ export default function CampusMap(props: Props) {
         if (current.current.picking)
           current.current.onPin({ lat: e.latlng.lat, lng: e.latlng.lng });
       });
+<<<<<<< HEAD
       setProvider(
         key ? "OpenStreetMap · Google unavailable" : "OpenStreetMap",
       );
+=======
+      setProvider(key ? "OpenStreetMap · Google unavailable" : "OpenStreetMap");
+>>>>>>> origin/master
       setReady(1);
     }
     void init();
@@ -210,6 +242,10 @@ export default function CampusMap(props: Props) {
     }
     for (const bus of props.buses) {
       const color = routeById(bus.routeId).color;
+<<<<<<< HEAD
+=======
+      const requested = bus.id === props.requestedBusId;
+>>>>>>> origin/master
       let marker = busMarkers.current[bus.id];
       if (leaflet.current) {
         if (!marker) {
@@ -228,6 +264,18 @@ export default function CampusMap(props: Props) {
             .on("click", () => current.current.onBus(bus.id));
           busMarkers.current[bus.id] = marker;
         }
+<<<<<<< HEAD
+=======
+        if (marker._requested !== requested) {
+          marker.setIcon(L.divIcon({ className: `bus-marker ${requested ? "requested-bus-marker" : ""}`,
+            html: `${busSvg(color, requested)}<b>${requested ? "YOUR BUS · " : ""}${bus.id}</b>`,
+            iconSize: [44, 58], iconAnchor: [22, 22] }));
+          marker.setZIndexOffset(requested ? 2000 : 1000);
+          marker._requested = requested;
+        }
+        marker.setOpacity(props.requestedBusId && !requested ? 0.25 : 1);
+        marker.getElement()?.classList.toggle("muted-bus-marker", !!props.requestedBusId && !requested);
+>>>>>>> origin/master
         marker.setLatLng([bus.point.lat, bus.point.lng]);
       } else if (gm.current) {
         if (!marker) {
@@ -246,6 +294,16 @@ export default function CampusMap(props: Props) {
           marker.addListener("click", () => current.current.onBus(bus.id));
           busMarkers.current[bus.id] = marker;
         }
+<<<<<<< HEAD
+=======
+        marker.setIcon({ url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(busSvg(color, requested)),
+          scaledSize: new window.google.maps.Size(requested ? 54 : 44, requested ? 54 : 44),
+          anchor: new window.google.maps.Point(requested ? 27 : 22, requested ? 27 : 22) });
+        marker.setTitle(requested ? `Your requested bus · ${bus.id}` : bus.id);
+        marker.setLabel(requested ? { text: "YOUR BUS", color: "#752f42", fontSize: "10px", fontWeight: "bold" } : null);
+        marker.setZIndex(requested ? 2000 : 1000);
+        marker.setOpacity(props.requestedBusId && !requested ? 0.25 : 1);
+>>>>>>> origin/master
         marker.setPosition(bus.point);
       }
     }
@@ -256,7 +314,11 @@ export default function CampusMap(props: Props) {
       });
       gm.current?.panTo(selected.point);
     }
+<<<<<<< HEAD
   }, [props.buses, props.selectedBus, props.follow, ready]);
+=======
+  }, [props.buses, props.selectedBus, props.requestedBusId, props.follow, ready]);
+>>>>>>> origin/master
   useEffect(() => {
     if (!props.focus || !ready) return;
     leaflet.current?.flyTo([props.focus.lat, props.focus.lng], 16, {
@@ -288,10 +350,37 @@ export default function CampusMap(props: Props) {
         });
     }
   }, [props.pin, ready]);
+<<<<<<< HEAD
   const recenter = () => {
     leaflet.current?.flyTo([1.5574, 103.6384], 15, { duration: 0.8 });
     gm.current?.setZoom(15);
     gm.current?.panTo({ lat: 1.5574, lng: 103.6384 });
+=======
+  useEffect(() => {
+    if (!ready) return;
+    const point = props.userLocation;
+    if (leaflet.current) {
+      if (userMarker.current) leaflet.current.removeLayer(userMarker.current);
+      if (accuracyCircle.current) leaflet.current.removeLayer(accuracyCircle.current);
+      userMarker.current = null; accuracyCircle.current = null;
+      if (point) {
+        accuracyCircle.current = L.circle([point.lat, point.lng], { radius: point.accuracy, color: "#287de0", weight: 1, fillOpacity: 0.1, interactive: false }).addTo(leaflet.current);
+        userMarker.current = L.marker([point.lat, point.lng], { icon: L.divIcon({ className: "passenger-location-marker", html: '<span></span><b>You</b>', iconSize: [24, 40], iconAnchor: [12, 12] }), title: "Your GPS location", zIndexOffset: 2500 }).addTo(leaflet.current);
+      }
+    } else if (gm.current) {
+      userMarker.current?.setMap(null); accuracyCircle.current?.setMap(null);
+      userMarker.current = null; accuracyCircle.current = null;
+      if (point) {
+        userMarker.current = new window.google.maps.Marker({ map: gm.current, position: point, title: "Your GPS location", icon: { path: window.google.maps.SymbolPath.CIRCLE, scale: 8, fillColor: "#287de0", fillOpacity: 1, strokeColor: "white", strokeWeight: 3 }, zIndex: 2500 });
+        accuracyCircle.current = new window.google.maps.Circle({ map: gm.current, center: point, radius: point.accuracy, fillColor: "#287de0", fillOpacity: 0.1, strokeColor: "#287de0", strokeWeight: 1, clickable: false });
+      }
+    }
+  }, [props.userLocation, ready]);
+  const recenter = () => {
+    leaflet.current?.flyTo([1.5603, 103.6375], 16, { duration: 0.8 });
+    gm.current?.setZoom(15);
+    gm.current?.panTo({ lat: 1.5603, lng: 103.6375 });
+>>>>>>> origin/master
   };
   return (
     <div className={`campus-map ${props.picking ? "picking" : ""}`}>
@@ -301,6 +390,13 @@ export default function CampusMap(props: Props) {
         <span>UTM Johor Bahru</span>
         <span className="map-location-detail">1.5585° N, 103.6380° E</span>
       </div>
+<<<<<<< HEAD
+=======
+      {props.onLocate && <div className="passenger-gps-control">
+        <button onClick={props.onLocate} aria-pressed={!!props.locating}><Crosshair size={15}/>{props.locating ? "Stop my location" : "My location"}</button>
+        {props.locating && <small>{props.userLocation ? `You · accuracy ±${Math.round(props.userLocation.accuracy)} m` : "Waiting for a fresh GPS reading…"}</small>}
+      </div>}
+>>>>>>> origin/master
       <div className="map-tools">
         <button aria-label="Centre on campus" onClick={recenter}>
           <Crosshair size={19} />
@@ -327,11 +423,31 @@ export default function CampusMap(props: Props) {
       </div>
       {props.picking && (
         <div className="pin-prompt">
+<<<<<<< HEAD
           <MapPin size={17} /> Tap the map to pin your destination
         </div>
       )}
       <div className="map-provider">
         {provider} <span>· Demo route geometry</span>
+=======
+          <MapPin size={17} /> Tap the map to pin your{" "}
+          {props.pinLabel || "destination"}
+        </div>
+      )}
+      <div className="map-provider">
+        {provider}{" "}
+        <span>
+          ·{" "}
+          <a
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Road data © OpenStreetMap contributors
+          </a>{" "}
+          · demo service
+        </span>
+>>>>>>> origin/master
       </div>
     </div>
   );

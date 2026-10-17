@@ -57,11 +57,19 @@ const base = process.env.TEST_URL || "http://127.0.0.1:4318";
       ).status,
       400,
     );
+<<<<<<< HEAD
     await student.getByRole("tab", { name: "Plan a trip" }).click();
     await student.locator("#pickup").selectOption("cp");
     await student.locator("#destination").selectOption("fke");
     await student
       .getByRole("button", { name: "Request bus BK01", exact: true })
+=======
+    await student.getByRole("button", { name: "Plan a trip" }).click();
+    await student.locator("#pickup").selectOption("cp");
+    await student.locator("#destination").selectOption("fke");
+    await student
+      .getByRole("button", { name: "Notify driver · BK01", exact: true })
+>>>>>>> origin/master
       .click();
     await student
       .getByRole("heading", { name: "Your bus is on its way." })
@@ -108,7 +116,11 @@ const base = process.env.TEST_URL || "http://127.0.0.1:4318";
     await driver
       .getByRole("button", { name: "Demo: arrive & update passengers" })
       .click();
+<<<<<<< HEAD
     await student.getByRole("tab", { name: "Bus info", exact: true }).click();
+=======
+    await student.getByRole("button", { name: "Bus info", exact: true }).click();
+>>>>>>> origin/master
     await student
       .getByText("Your last trip is complete. Thank you!")
       .waitFor();
@@ -117,14 +129,22 @@ const base = process.env.TEST_URL || "http://127.0.0.1:4318";
       ["mei", 3],
     ]) {
       await student.getByLabel("Demo passenger profile").selectOption(id);
+<<<<<<< HEAD
       await student.getByRole("tab", { name: "Plan a trip" }).click();
+=======
+      await student.getByRole("button", { name: "Plan a trip" }).click();
+>>>>>>> origin/master
       await student.locator("#pickup").selectOption("cp");
       await student.locator("#destination").selectOption("fke");
       await student
         .getByRole("button", { name: `${count} passengers`, exact: true })
         .click();
       await student
+<<<<<<< HEAD
         .getByRole("button", { name: "Request bus BK01", exact: true })
+=======
+        .getByRole("button", { name: "Notify driver · BK01", exact: true })
+>>>>>>> origin/master
         .click();
       await student
         .getByRole("heading", { name: "Your bus is on its way." })
@@ -139,7 +159,11 @@ const base = process.env.TEST_URL || "http://127.0.0.1:4318";
     );
     await student.getByRole("button", { name: "Cancel request" }).click();
     await student
+<<<<<<< HEAD
       .getByRole("button", { name: "Request bus BK01", exact: true })
+=======
+      .getByRole("button", { name: "Notify driver · BK01", exact: true })
+>>>>>>> origin/master
       .waitFor();
     await driver.locator("summary").click();
     await driver
@@ -283,3 +307,8 @@ const base = process.env.TEST_URL || "http://127.0.0.1:4318";
   console.error(e);
   process.exit(1);
 });
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> origin/master
