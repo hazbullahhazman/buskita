@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env*
+!.env.example
+.demo-data/
+test-results/
+review-source/
+*.log
+*.zip
+.vercel/
