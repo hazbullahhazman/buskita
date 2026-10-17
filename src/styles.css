@@ -147,11 +147,7 @@ small {
   width: 100%;
   margin-top: 57px;
 }
-<<<<<<< HEAD
-.app-rail nav a {
-=======
 .app-rail nav :is(a, button) {
->>>>>>> origin/master
   height: 60px;
   display: flex;
   flex-direction: column;
@@ -161,28 +157,16 @@ small {
   color: #859087;
   border-radius: 11px;
 }
-<<<<<<< HEAD
-.app-rail nav a span {
-  font-size: 9px;
-  font-weight: 600;
-}
-.app-rail nav a:hover,
-=======
 .app-rail nav :is(a, button) span {
   font-size: 9px;
   font-weight: 600;
 }
 .app-rail nav :is(a, button):hover,
->>>>>>> origin/master
 .app-rail > button:hover {
   background: #f6f7f3;
   color: var(--maroon);
 }
-<<<<<<< HEAD
-.app-rail nav a.active {
-=======
 .app-rail nav :is(a, button).active {
->>>>>>> origin/master
   color: var(--maroon);
   background: #f8f0f1;
 }
@@ -1916,21 +1900,13 @@ tr:last-child td {
     justify-content: space-around;
     flex: 1;
   }
-<<<<<<< HEAD
-  .app-rail nav a {
-=======
   .app-rail nav :is(a, button) {
->>>>>>> origin/master
     height: 50px;
     min-width: 75px;
     gap: 5px;
     border-radius: 9px;
   }
-<<<<<<< HEAD
-  .app-rail nav a span {
-=======
   .app-rail nav :is(a, button) span {
->>>>>>> origin/master
     font-size: 9px;
   }
   .app-rail > button {
@@ -2318,8 +2294,6 @@ tr:last-child td {
     top: 176px;
   }
 }
-<<<<<<< HEAD
-=======
 
 /* Passenger information stays above the planner in one scrollable panel. */
 .journey-dock {
@@ -2606,4 +2580,3 @@ tr:last-child td {
 .passenger-gps-control small { padding: 4px 6px; background: #fffffff0; border-radius: 4px; font-size: 10px; }
 @media (max-width: 600px) { .passenger-gps-control { top: 176px; left: 12px; right: auto; justify-items: start; } }
 .campus-map.picking .passenger-gps-control { display: none; }
->>>>>>> origin/master

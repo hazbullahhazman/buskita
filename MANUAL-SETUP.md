@@ -31,11 +31,7 @@ Open http://localhost:4317, http://localhost:4317/driver, and http://localhost:4
 
 The cloud API is tested locally using a Redis REST test double. An actual Vercel deployment and real Upstash connection still require verification after you redeploy. No credentials are included in this archive.
 
-<<<<<<< HEAD
 This remains an open demonstration with three shared identities and unauthenticated driver/office pages. The route and stop coordinates are approximate and need UTM field verification before operational use.
-=======
-This remains an open demonstration with three shared identities and unauthenticated driver/office pages. The route and stop coordinates are approximate and need UTM field verification before operational use.
->>>>>>> origin/master
 
 ## Fix for ERR_MODULE_NOT_FOUND (cloud-handler)
 
@@ -43,9 +39,6 @@ Use the Runtime-Fix ZIP to replace the previous repository files. This corrects 
 
 Upload all updated files, including tsconfig.cloud.json and tests/cloud-runtime.mjs. The build now runs a plain-Node compiled API smoke test so this import failure is caught before deployment. Commit the update, then redeploy that new commit in Vercel. If redeploying manually, turn off reuse of the existing build cache for this deployment.
 
-<<<<<<< HEAD
-After deployment, open /api/state. A JSON storage setup message means the module-loading crash is fixed and Redis still needs connecting; a JSON buses array means the backend is ready. The website reconnects automatically. Do not change or share your database tokens to fix this import error.
-=======
 After deployment, open /api/state. A JSON storage setup message means the module-loading crash is fixed and Redis still needs connecting; a JSON buses array means the backend is ready. The website reconnects automatically. Do not change or share your database tokens to fix this import error.
 
 ## Phone layout and presentation links
@@ -78,4 +71,3 @@ The road upgrade preserves stored records, repositions simulated buses, invalida
 Plan a trip now applies the nearest-stop rule to each free pin/place, within a selectable 300/500/800 m radius (500 m default). An explicitly selected stop remains fixed. Among buses serving those two stops, it recommends the lowest estimated total time: walk to pickup + remaining wait + forward-route ride with intermediate-stop allowances + walk to destination. The recommendation is the bus used by Notify driver. Unavailable/full buses and departures arriving before the estimated walk to pickup are excluded; no unverified next-lap departure is invented.
 
 These are estimates using straight-line walking at 1.2 m/s and the existing route-speed/dwell model. All three demo buses still share one loop, so no claim is made of comparing different official UTM routes. A same-stop or out-of-radius selection gets an explanation instead of a misleading booking recommendation. Proposed stops remain labelled; real boarding access needs field validation.
->>>>>>> origin/master

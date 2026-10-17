@@ -12,11 +12,7 @@ Not verified: Google Maps with an actual owner-provided API key, real-world GPS 
 
 All route coordinates remain explicitly approximate. Eleven demo stops (five inherited and six proposed) have gaps no greater than 500 metres measured along the inherited loop. This does not certify official stops, walking paths or lane accuracy.
 
-<<<<<<< HEAD
 English UI update: translated passenger, driver and office copy, accessibility labels, GPS/API errors, QR help, CSV headings and time formatting. Production build and the existing browser regression suite passed; inspected English mobile layout. UTM place and route names are retained.
-=======
-English UI update: translated passenger, driver and office copy, accessibility labels, GPS/API errors, QR help, CSV headings and time formatting. Production build and the existing browser regression suite passed; inspected English mobile layout. UTM place and route names are retained.
->>>>>>> origin/master
 
 ## Vercel compatibility fix
 
@@ -24,13 +20,6 @@ English UI update: translated passenger, driver and office copy, accessibility l
 - Changed client updates to polling with explicit connection errors and stale-response protection.
 - All 12 automated tests passed, including concurrent bookings, duplicate rejection, cold-start persistence via a shared Redis test double, simulation timing, and API validation.
 - The full three-context browser regression passed against the cloud API handlers using a local Redis REST double. Direct visits and reloads of passenger, driver, and office pages passed; missing-storage error display passed.
-<<<<<<< HEAD
-- Production build passed. Actual Vercel routing and real Upstash storage remain unverified until the updated source is deployed with database credentials.
-
-## Production ESM import regression
-
-Vercel runtime logs identified ERR_MODULE_NOT_FOUND for server/cloud-handler: extensionless imports passed the tsx tests but failed under native Node ESM. All relative imports in the cloud dependency chain now include .js extensions. The build also compiles the API with NodeNext resolution and imports both emitted entry points using plain Node, checking missing-storage and invalid-request JSON responses. This verifies the runtime import chain without tsx or Vite. Actual hosted deployment must still be checked after uploading the updated files.
-=======
 - Production build passed. Actual Vercel routing and real Upstash storage remain unverified until the updated source is deployed with database credentials.
 
 ## Production ESM import regression
@@ -64,4 +53,3 @@ After ordering, the requested bus remains selected/highlighted and other map mar
 My location explicitly starts a browser GPS watch: a blue You marker and an accuracy-radius circle display fresh readings. Stop my location clears the watch and marker; readings older than 30 seconds are hidden. Permission errors are shown without substituting a position. Passenger coordinates stay in browser state and are not posted to the backend. A location fix centres the map once; it does not automatically change a planned pickup.
 
 Bottom Bus info and Plan a trip controls open their section; tapping the same open tab lowers the panel. Local mobile browser tests passed both toggle sequences, requested-bus emphasis, permitted GPS with accuracy, stop/cleanup, absence of location POSTs, and denied permission. Tests used browser-emulated GPS; real phone GPS accuracy and the Google Maps provider remain unverified.
->>>>>>> origin/master

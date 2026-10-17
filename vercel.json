@@ -4,10 +4,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-<<<<<<< HEAD
-=======
     { "source": "/passenger", "destination": "/index.html" },
->>>>>>> origin/master
     { "source": "/driver", "destination": "/index.html" },
     { "source": "/office", "destination": "/index.html" }
   ]
