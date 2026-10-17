@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && npm run test:cloud-runtime && vite build",
     "start": "tsx server/index.ts --production",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "test:cloud-runtime": "tsc -p tsconfig.cloud.json && node tests/cloud-runtime.mjs"
   },
   "dependencies": {
     "express": "^4.21.2",

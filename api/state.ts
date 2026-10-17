@@ -1,4 +1,4 @@
-import { handle } from "../server/cloud-handler";
+import { handle } from "../server/cloud-handler.js";
 export default {
   fetch(request: Request) {
     return handle(request, false);

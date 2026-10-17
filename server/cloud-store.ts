@@ -1,6 +1,6 @@
-import { State } from "../shared/model";
-import { atProgress, initialState, wrap } from "../shared/engine";
-import { applyAction } from "./actions";
+import { State } from "../shared/model.js";
+import { atProgress, initialState, wrap } from "../shared/engine.js";
+import { applyAction } from "./actions.js";
 
 export class ServiceError extends Error {
   constructor(

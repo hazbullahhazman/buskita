@@ -19,7 +19,9 @@ export function useDemo() {
   async function readResponse(response: Response): Promise<State> {
     if (!response.headers.get("content-type")?.includes("application/json"))
       throw Error(
-        "The bus API is missing. Upload the api folder and vercel.json, then redeploy.",
+        response.status >= 500
+          ? "The bus server could not start. The project owner should check Vercel runtime logs. We will retry automatically."
+          : "The bus API did not return data. Check that the api folder and vercel.json were deployed.",
       );
     const data = await response.json();
     if (!response.ok)

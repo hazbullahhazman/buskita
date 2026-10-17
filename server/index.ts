@@ -1,4 +1,4 @@
-import { applyAction } from "./actions";
+import { applyAction } from "./actions.js";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import {
@@ -9,12 +9,12 @@ import {
   renameSync,
 } from "node:fs";
 import path from "node:path";
-import { State } from "../shared/model";
+import { State } from "../shared/model.js";
 import {
   atProgress,
   initialState,
   wrap,
-} from "../shared/engine";
+} from "../shared/engine.js";
 
 const app = express();
 app.disable("x-powered-by");

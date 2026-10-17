@@ -32,3 +32,11 @@ Open http://localhost:4317, http://localhost:4317/driver, and http://localhost:4
 The cloud API is tested locally using a Redis REST test double. An actual Vercel deployment and real Upstash connection still require verification after you redeploy. No credentials are included in this archive.
 
 This remains an open demonstration with three shared identities and unauthenticated driver/office pages. The route and stop coordinates are approximate and need UTM field verification before operational use.
+
+## Fix for ERR_MODULE_NOT_FOUND (cloud-handler)
+
+Use the Runtime-Fix ZIP to replace the previous repository files. This corrects the relative imports throughout api, server, and shared to use explicit .js extensions for compiled Node ESM. Keep the .ts filenames as provided: TypeScript resolves the .js imports to those source files and emits matching JavaScript.
+
+Upload all updated files, including tsconfig.cloud.json and tests/cloud-runtime.mjs. The build now runs a plain-Node compiled API smoke test so this import failure is caught before deployment. Commit the update, then redeploy that new commit in Vercel. If redeploying manually, turn off reuse of the existing build cache for this deployment.
+
+After deployment, open /api/state. A JSON storage setup message means the module-loading crash is fixed and Redis still needs connecting; a JSON buses array means the backend is ready. The website reconnects automatically. Do not change or share your database tokens to fix this import error.

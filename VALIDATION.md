@@ -21,3 +21,7 @@ English UI update: translated passenger, driver and office copy, accessibility l
 - All 12 automated tests passed, including concurrent bookings, duplicate rejection, cold-start persistence via a shared Redis test double, simulation timing, and API validation.
 - The full three-context browser regression passed against the cloud API handlers using a local Redis REST double. Direct visits and reloads of passenger, driver, and office pages passed; missing-storage error display passed.
 - Production build passed. Actual Vercel routing and real Upstash storage remain unverified until the updated source is deployed with database credentials.
+
+## Production ESM import regression
+
+Vercel runtime logs identified ERR_MODULE_NOT_FOUND for server/cloud-handler: extensionless imports passed the tsx tests but failed under native Node ESM. All relative imports in the cloud dependency chain now include .js extensions. The build also compiles the API with NodeNext resolution and imports both emitted entry points using plain Node, checking missing-storage and invalid-request JSON responses. This verifies the runtime import chain without tsx or Vite. Actual hosted deployment must still be checked after uploading the updated files.

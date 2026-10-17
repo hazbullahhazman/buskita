@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "rootDir": ".",
+    "outDir": "test-results/cloud-runtime"
+  },
+  "include": ["api/**/*.ts"],
+  "exclude": ["node_modules", "test-results"]
+}

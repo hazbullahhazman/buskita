@@ -1,4 +1,4 @@
-import { createStore, ServiceError } from "./cloud-store";
+import { createStore, ServiceError } from "./cloud-store.js";
 const store = createStore();
 export async function handle(
   request: Request,

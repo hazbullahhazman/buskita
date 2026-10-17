@@ -8,7 +8,7 @@ import {
   ROUTES,
   routeById,
   stopById,
-} from "./model";
+} from "./model.js";
 export function distance(a: Point, b: Point) {
   const rad = Math.PI / 180;
   const dLat = (b.lat - a.lat) * rad,

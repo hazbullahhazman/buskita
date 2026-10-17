@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { State, USERS, STOPS, routeById } from "../shared/model";
+import { State, USERS, STOPS, routeById } from "../shared/model.js";
 import {
   atProgress,
   distance,
@@ -7,7 +7,7 @@ import {
   processStop,
   STOP_PROGRESS,
   wrap,
-} from "../shared/engine";
+} from "../shared/engine.js";
 const validString = (x: unknown, max = 200): x is string =>
   typeof x === "string" && x.trim().length > 0 && x.length <= max;
 // Shared validation for the local server and hosted demo API.
