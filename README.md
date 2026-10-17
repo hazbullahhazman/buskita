@@ -1,0 +1,71 @@
+# BasKita UTM
+
+A working, shared-state campus transport **demo** with a minimal maroon, warm-white and green interface. The original Gemini export remains in `review-source/`; the refined application lives at this repository's root.
+
+## Start
+
+Requires Node.js 22.12+ (tested with Node 24).
+
+```sh
+npm install
+npm run dev
+```
+
+- Passenger: http://localhost:4317/?stop=cp
+- Driver: http://localhost:4317/driver
+- Office: http://localhost:4317/office
+
+The three pages use the same Express backend, with Server-Sent Events for shared updates. Driver actions update passenger trips and office statistics. Requests, reports and bus state persist in `.demo-data/state.json` on this computer. This is a single-server demo, not a multi-instance production database.
+
+If another application uses the default port, set the `PORT` environment variable. In PowerShell: `$env:PORT='4320'`, then `npm run dev`.
+
+## Phone and QR demo
+
+Open the computer's LAN address, e.g. `http://<computer-ip>:4317`, on devices using the same reachable Wi-Fi network. Open the QR dialog from that address; its generated passenger URL then uses the reachable address. A QR generated from `localhost` only points back to the device scanning it, so it is not suitable for another phone. Windows firewall or network client isolation can block LAN access.
+
+For a shared HTTPS hosting address, set `VITE_PUBLIC_URL=https://your-demo-host` in `.env.local`, then restart development or rebuild production. Each QR includes a stop ID. Driver and office have separate paths on the same domain.
+
+Public browser GPS requires HTTPS (localhost is the development exception). LAN HTTP works for simulated buses and bookings, but not reliable phone GPS access. No deployment or HTTPS tunnel is configured by this project.
+
+## Demonstration walkthrough
+
+1. Open the passenger, driver and office pages in separate tabs, browser profiles or devices.
+2. On the passenger page choose Amira, Danial or Mei. These are three fixed demo identities, not authenticated accounts. A URL can select an identity: `/?stop=cp&user=danial`.
+3. Select BK01, open **Plan a trip**, choose Centre Point / DSI → FKE and a passenger count (1–3). Alternatively, pin a destination on the map. The nearest demo stop is proposed, with a clearly labelled straight-line walking distance.
+4. Press **Request bus BK01**. The request appears on the corresponding driver page and in the office demand panel.
+5. On the driver page choose CP and press **Demo: arrive & update passengers**. The demo bus jumps to that stop; alighting is processed first, then waiting groups board in queue order, subject to capacity. Repeating the action does not double-count.
+6. Choose FKE and confirm arrival. The passenger trip completes and office counts change. The simulation moves the map marker, but **does not assume that a passenger boarded merely because the bus passed nearby**.
+7. Try reports, campus notices and the office CSV export. Switch between the three passenger identities to demonstrate simultaneous requests.
+
+## Maps, routes and honest limitations
+
+- Without a Google Maps key, the UI uses OpenStreetMap tiles with attribution. This is visibly labelled.
+- To use Google Maps, copy `.env.example` to `.env.local`, set `VITE_GOOGLE_MAPS_API_KEY` to a browser key enabled for Maps JavaScript API, configure website/API restrictions in its owning Google Cloud project, and restart/rebuild. No key is embedded in source. Google Maps with a real configured key has not been tested in this environment.
+- BK01 is maroon, BK02 green, BK03 blue. Each bus has its own route identity. **All three currently use the same approximate inherited loop**, not three accurately reconstructed routes from the screenshot. No original official route file was supplied.
+- The supplied prototype's five approximate stop locations are retained. Six proposed stops fill gaps so the distance **along the demo loop** between stops is at most 500 metres. Proposed stops are not claims that a shelter exists or that the roadside location is accessible.
+- Locations, stop names and lane alignment must be checked against UTM's official routes or a recorded field GPS survey before a real pilot. A screenshot alone cannot establish precise coordinates, turn restrictions or direction.
+- ETA uses forward distance around the one-way loop, including wraparound, plus a 25-second allowance for intermediate stops. It is an estimate, not a timetable or calibrated prediction. Unknown/zero GPS speeds are not replaced by fabricated measured speeds; the ETA model uses a minimum planning speed, which needs field calibration. Off-route, paused and stale buses do not produce ETAs.
+- GPS matching projects onto the assigned demo geometry and uses previous progress to reduce jumps. It rejects stale, low-quality and implausibly fast GPS fixes. Raw off-route locations remain off-route instead of being forced onto the line. It is a baseline matcher for this simple loop, not a validated solution for overlapping/branching campus routes.
+- Student positions are not collected. A driver's GPS session is explicitly started/stopped. Closing the page stops that browser's watcher; existing coordinates become stale after 20 seconds. A foreground browser page does not guarantee tracking when a phone locks. An Android foreground-service implementation would be a separate step.
+
+## Validation
+
+```sh
+npm test
+npm run build
+```
+
+Unit tests cover forward loop distances, geometry projection, stop spacing, capacity, idempotent arrivals, bus separation and unavailable ETAs.
+
+`tests/browser.cjs` is an optional Playwright regression test for three independent browser sessions. It uses Chrome, and expects a **fresh, isolated** demo server at `http://127.0.0.1:4318` (override with `TEST_URL`). Install Playwright locally for this optional suite or point `PLAYWRIGHT_MODULE` to an existing installation. In PowerShell, start the isolated server with `PORT=4318` and a unique `DEMO_DATA_DIR` environment variable before `npm run start` (build first), then run `node tests/browser.cjs` in another terminal. It exercises all three identities, booking, capacity-related transitions, cancellation, report delivery, notices, CSV, QR links, map pinning, mobile overflow and GPS denial/validation. It creates real test records in that isolated store.
+
+## Production build
+
+```sh
+npm run build
+npm start
+```
+
+Serve through HTTPS for real phone GPS. The server must remain running for live updates and shared state.
+
+**Access is intentionally open for demonstration.** Driver, office and passenger identities are not authenticated. Before public operational deployment, add server-enforced roles, account/session management, persistent database transactions, request throttling and an appropriate driver-location retention policy. Do not use this demo as an authenticated live dispatch service.

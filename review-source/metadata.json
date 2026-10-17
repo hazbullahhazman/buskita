@@ -1,0 +1,8 @@
+{
+  "name": "BasKita UTM - Penjejakan Bas Kampus Lingkaran Budi",
+  "description": "Sistem penjejakan bas kampus UTM Skudai pintar. Penumpang dapat melihat ETA tepat secara masa nyata, menotifikasi pemandu bahawa sedang menunggu di stesen, dan pemandu memantau penumpang di laluan Lingkaran Budi.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
